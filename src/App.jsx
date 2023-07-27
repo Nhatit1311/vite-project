@@ -1,8 +1,10 @@
+import './style.css';
 import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
 import LoginPage from "./pages/login/login";
+import Register from "./pages/register/Register";
 import Contact from "./pages/contact/contact";
 import Book from "./pages/book/Book";
 import Header from "./components/Header/header";
@@ -42,6 +44,10 @@ export default function App() {
     {
       path: "/login",
       element: <LoginPage/>,
+    },
+    {
+      path: "/register",
+      element: <Register/>,
     },
   ]);
 
