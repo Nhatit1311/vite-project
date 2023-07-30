@@ -1,16 +1,29 @@
-
-import { Button, Divider, Form, Input } from "antd";
+import { Button, Divider, Form, Input, message, notification } from "antd";
 import './register.scss';
-import { Link } from "react-router-dom";
-
-const onFinish = (values) => {
-  console.log("Success:", values);
-};
-const onFinishFailed = (errorInfo) => {
-  console.log("Failed:", errorInfo);
-};
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { callRegister } from "../../services/API";
 
 const Register = () => {
+    const navigate = useNavigate(); // dùng useNavigate để điều hướng trang
+    const [isSubmit, setIsSubmit] = useState(false); // loading khi nhấn submit
+    const onFinish = async (values) => {
+        const {username, email, password, phone} = values;
+        setIsSubmit(true);
+        const res = await callRegister(username, email, password, phone); // gọi API truyền các tham số đầu vào
+        setIsSubmit(false);
+        if(res?.data?._id) {
+            message.success('Đăng ký tài khoản thành công!');
+            navigate('/login')
+        }else {
+            notification.error({
+                message: "Có lỗi xảy ra",
+                description:
+                    res.message && Array.isArray(res.message) ? res.message[0] : res.message,
+                duration: 5
+            })
+        }
+    };
     return (
         <div className="register-page">
             <main className="main">
@@ -21,12 +34,10 @@ const Register = () => {
                             <Divider/>
                         </div>
                         <Form name="basic" style={{maxWidth: 600, margin: '0 auto'}} 
-                            initialValues={{remember: true,}}
                             onFinish={onFinish}
-                            onFinishFailed={onFinishFailed}
                             autoComplete="off"
                         >
-                            <Form.Item labelCol={{ span: 24 }} label="Họ Và Tên" name="name" 
+                            <Form.Item labelCol={{ span: 24 }} label="Họ Và Tên" name="username" 
                                 rules={[{required: true, message: "Vui lòng nhập tên của bạn!",},]}>
                                 <Input />
                             </Form.Item>
@@ -43,7 +54,7 @@ const Register = () => {
                                 <Input/>
                             </Form.Item>
                             <Form.Item wrapperCol={{offset: 8, span: 16,}}>
-                                <Button type="primary" htmlType="submit">Đăng Ký</Button>
+                                <Button type="primary" htmlType="submit" loading={isSubmit}>Đăng Ký</Button>
                             </Form.Item>
                             <Divider>Or</Divider>
                             <p className="text text-normal">Đã có tài khoản ?
